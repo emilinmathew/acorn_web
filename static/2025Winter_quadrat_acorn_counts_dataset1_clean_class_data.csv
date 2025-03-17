@@ -1,0 +1,17 @@
+TreeID,Year_season,Single/Multi Stemmed?,Diameter at Breast Height (DBH) (cm),Crown Diameter 1 (cm),Crown Diameter 2 (cm),Acorn Production - North (cups/quadrat),Acorn Production - South (cups/quadrat),Acorn Production - West (cups/quadrat),Acorn Production - East (cups/quadrat)
+3,2025Winter,Multi-stemmed,88,1191,1136,50,118,95,94
+12,2025Winter,Multi-stemmed,123,1343,1335,8,66,68,43
+15,2025Winter,Single-stemmed,103,1620,1670,42,6,81,2
+16,2025Winter,Multi-stemmed,98,1090,1210,23,14,17,7
+17,2025Winter,Multi-stemmed,49,210,68,13,5,14,4
+18,2025Winter,Multi-stemmed,85,1220,1330,231,390,7,169
+27,2025Winter,Multi-stemmed,44,875,848,2,5,0,2
+35,2025Winter,Multi-stemmed,53,1072,1029,209,202,283,77
+49,2025Winter,Single-stemmed,48,1200,1150,5,6,1,4
+51,2025Winter,Single-stemmed,48,1200,1000,26,62,55,2
+56,2025Winter,Multi-stemmed,88,1577,1088,145,57,68,69
+57,2025Winter,Multi-stemmed,118,1207,2401,18,12,43,18
+77,2025Winter,Multi-stemmed,70,1265,1240,18,16,24,14
+78,2025Winter,Single-stemmed,108,1320,611,12,17,16,2
+87,2025Winter,Single-stemmed,182,980,1433,7,2,3,3
+111,2025Winter,Single-stemmed,308,1661,1783,12,21,48,18

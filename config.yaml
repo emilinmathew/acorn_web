@@ -12,7 +12,7 @@ menu:
       url: /about/
 params:
   description: "A website about the ecological drivers of acorn production."
-  favicon: favicon.ico
+  favicon: purple.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
     - r
