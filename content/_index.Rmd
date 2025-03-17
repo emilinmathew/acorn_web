@@ -4,7 +4,7 @@ authors: "Emilin Mathew"
 output: html_document
 ---
 
-![Team Purple](/images/jasper.png)
+![Jasper Ridge](/images/jasper.png)
 
 # Abstract
 Acorn production in Quercus agrifolia (Coast Live Oak) is influenced by multiple environmental and structural factors, yet the extent of these influences remains unclear. We hypothesized that (1) the south-facing sides of trees would produce more acorns due to greater sunlight exposure, (2) trees with larger diameters at breast height (DBH) and greater crown diameters would have higher acorn production, and (3) acorn yield would decrease with lower vegetation density. We measured acorn production using quadrat sampling, analyzed the tree's structural attributes, and assessed vegetation density through the Normalized Difference Vegetation Index (NDVI). Our results indicated weak correlations between acorn yield and all tested variables, with p-values exceeding 0.05 and low R² values, suggesting these factors do not significantly correlate to acorn production. The findings highlight the complexity of acorn yield dynamics, likely influenced by unmeasured factors such as genetic variability, soil composition, and masting cycles. Future research with larger sample sizes and refined environmental metrics is needed to improve predictive models. These insights contribute to oak conservation efforts and understanding of acorn availability for wildlife.
@@ -12,6 +12,123 @@ Acorn production in Quercus agrifolia (Coast Live Oak) is influenced by multiple
 # Methods
 ## Study Area
 This study was conducted at Jasper Ridge Biological Preserve (‘Ootchamin ‘Ooyakma), a protected ecological research site in the eastern foothills of the Santa Cruz Mountains in Woodside, California (Figure 1). The preserve spans approximately 1,198 acres and has various habitats, including oak woodlands, chaparral, and grasslands. The Mediterranean climate in the preserve also provides natural variations in sunlight exposure, soil moisture, and vegetation density, making it an ideal location to assess the environmental and structural drivers of acorn production. 
+
+
+```{r map-setupp, include=FALSE}
+library(readr)
+library(dplyr)
+library(leaflet)
+
+# Load all datasets
+# Load tree data and acorn counts with consistent file path construction
+tree_data <- read_csv(here::here("static", "tree_data.csv"))
+
+fall_2023 <- read_csv(here::here("static", "2023Fall_Koenig_binocular_acorn_count.csv")) %>%
+  rename(Acorns_Fall_2023 = N30_count_Koenig_method)
+
+fall_2024 <- read_csv(here::here("static", "2024Fall_Koenig_binocular_acorn_count.csv")) %>%
+  rename(Acorns_Fall_2024 = N30_count_Koenig_method)
+
+winter_2024 <- read_csv(here::here("static", "2024Winter_quadrat_acorn_counts_dataset1_clean_class_data.csv")) %>%
+  rename(Acorns_Winter_2024 = `Acorn production (number of cups/quadrat) - North`)
+
+winter_2025 <- read_csv(here::here("static", "2025Winter_quadrat_acorn_counts_dataset1_clean_class_data.csv")) %>%
+  rename(Acorns_Winter_2025 = `Acorn Production - North (cups/quadrat)`)
+
+# Merge all datasets by TreeID
+tree_full <- tree_data %>%
+  left_join(fall_2023, by = "TreeID") %>%
+  left_join(fall_2024, by = "TreeID") %>%
+  left_join(winter_2024, by = "TreeID") %>%
+  left_join(winter_2025, by = "TreeID")
+
+# Rename Tree Structure column
+tree_full <- tree_full %>%
+  rename(Tree_Structure = `Single/Multi Stemmed?`)
+
+# Handle missing values (replace NAs with "No Data")
+tree_full <- tree_full %>%
+  mutate(
+    Acorns_Fall_2023 = ifelse(is.na(Acorns_Fall_2023), "No Data", Acorns_Fall_2023),
+    Acorns_Winter_2024 = ifelse(is.na(Acorns_Winter_2024), "No Data", Acorns_Winter_2024),
+    Acorns_Fall_2024 = ifelse(is.na(Acorns_Fall_2024), "No Data", Acorns_Fall_2024),
+    Acorns_Winter_2025 = ifelse(is.na(Acorns_Winter_2025), "No Data", Acorns_Winter_2025)
+  )
+
+# Define Stanford Colors
+stanford_red <- "#8C1515"  # Single-Stemmed (Circles)
+stanford_blue <- "#00008B"  # Multi-Stemmed (Squares)
+
+# Assign colors based on tree structure
+tree_full$color <- ifelse(tree_full$Tree_Structure == "Single-stemmed", stanford_red, stanford_blue)
+
+# Make multi-stemmed trees appear "square-like" by using a thick stroke
+tree_full$border_weight <- ifelse(tree_full$Tree_Structure == "Single-stemmed", 1, 6)
+
+# Function to create popups with all seasons displayed (NO BUTTONS)
+create_popup <- function(TreeID, Tree_Structure, DBH, Crown, Acorn_Fall_2023, Acorn_Winter_2024, Acorn_Fall_2024, Acorn_Winter_2025) {
+  paste0(
+    "<b>Tree ID:</b> ", TreeID, "<br>",
+    "<b>Structure:</b> ", Tree_Structure, "<br><br>",
+    "<b>🌿 Seasonal Data:</b><br><br>",
+    "<b>🍂 Fall 2023</b><br>",
+    "- <b>DBH:</b> ", DBH, " cm<br>",
+    "- <b>Crown Diameter:</b> ", Crown, " cm<br>",
+    "- <b>Acorn Count:</b> ", Acorn_Fall_2023, "<br><br>",
+    "<b>❄️ Winter 2024</b><br>",
+    "- <b>DBH:</b> ", DBH, " cm<br>",
+    "- <b>Crown Diameter:</b> ", Crown, " cm<br>",
+    "- <b>Acorn Count:</b> ", Acorn_Winter_2024, "<br><br>",
+    "<b>🍂 Fall 2024</b><br>",
+    "- <b>DBH:</b> ", DBH, " cm<br>",
+    "- <b>Crown Diameter:</b> ", Crown, " cm<br>",
+    "- <b>Acorn Count:</b> ", Acorn_Fall_2024, "<br><br>",
+    "<b>❄️ Winter 2025</b><br>",
+    "- <b>DBH:</b> ", DBH, " cm<br>",
+    "- <b>Crown Diameter:</b> ", Crown, " cm<br>",
+    "- <b>Acorn Count:</b> ", Acorn_Winter_2025
+  )
+}
+```
+
+```{r map, echo=FALSE}
+# Create the interactive map
+leaflet(tree_full) %>%
+  addProviderTiles(providers$Esri.WorldImagery) %>%
+  setView(lng = -122.23, lat = 37.41, zoom = 14) %>%
+  
+  # Single-stemmed trees (Stanford Cardinal Red Circles)
+  addCircleMarkers(
+    data = tree_full[tree_full$Tree_Structure == "Single-stemmed", ],
+    ~Longitude, ~Latitude,
+    radius = 6,
+    color = stanford_red,
+    fillOpacity = 0.7,
+    stroke = TRUE,
+    weight = 1,  # Normal stroke
+    popup = ~create_popup(TreeID, Tree_Structure, `Diameter at breast height (DBH) (cm)`, `Crown diameter 1 (cm)`, Acorns_Fall_2023, Acorns_Winter_2024, Acorns_Fall_2024, Acorns_Winter_2025)
+  ) %>%
+  
+  # Multi-stemmed trees (Stanford Blue "Squares" using thick stroke)
+  addCircleMarkers(
+    data = tree_full[tree_full$Tree_Structure == "Multi-stemmed", ],
+    ~Longitude, ~Latitude,
+    radius = 6,
+    color = stanford_blue,
+    fillOpacity = 0.7,
+    stroke = TRUE,
+    weight = 6,  # Thicker border for square-like appearance
+    popup = ~create_popup(TreeID, Tree_Structure, `Diameter at breast height (DBH) (cm)`, `Crown diameter 1 (cm)`, Acorns_Fall_2023, Acorns_Winter_2024, Acorns_Fall_2024, Acorns_Winter_2025)
+  ) %>%
+  
+  addLegend("bottomright",
+            colors = c(stanford_red, stanford_blue),
+            labels = c("Single-stemmed", "Multi-stemmed"),
+            title = "Tree Structure")
+
+```
+
+
 
 ## Data Collection
 We collected data from 16 mature coast live oak trees within the preserve in January of Winter 2024 and 2025. These trees were healthy, free from major diseases, and of varying sizes. The structural measurements we took from each tree were diameter at breast height (DBH), crown diameters, and canopy exposures. DBH was measured at 1.4 m above the ground using diameter tape. The DBH of the three largest trunks was recorded for trees with multiple trunks, and one final DBH was taken from such trees by taking the square root of the sum of all three DBHs. We measured two central diameters: (1) the diameter of the maximum axis and (2) the axis perpendicular to the maximum axis. We acquired acorn production measurements using the quadrat method. The quadrats, which measured 62cm x 62cm, were placed in each cardinal direction of the focal tree, ensuring that the quadrat was aligned to the edge of the tree crown. Only acorn caps within the quadrats were counted and incorporated into the dataset to prevent double counting. Additionally, we incorporated the Normalized Difference Vegetation Index (NDVI) from the Sentinel-2 satellite for the 2024 and 2025 winter seasons to obtain vegetation density near our 16 trees. 
