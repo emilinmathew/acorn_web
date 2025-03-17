@@ -1,0 +1,33 @@
+baseurl: /
+languageCode: en-US
+title: Drivers of Acordn Production
+theme: hugo-lithium
+ignoreFiles:
+  - _cache$
+permalinks:
+  post: /:year/:month/:day/:slug/
+menu:
+  main:
+    - name: About
+      url: /about/
+params:
+  description: "A website about the ecological drivers of acorn production."
+  favicon: favicon.ico
+  highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
+  highlightjsLang:
+    - r
+    - yaml
+  highlightjsTheme: github
+  highlightjsVersion: 9.12.0
+  logo:
+    alt: Home
+    height: 50
+    url: logo.jpeg
+    width: 50
+markup:
+  defaultMarkdownHandler: goldmark
+  goldmark:
+    renderer:
+      unsafe: yes
+  highlight:
+    codeFences: no
