@@ -4,7 +4,7 @@ authors: "Emilin Mathew"
 output: html_document
 ---
 
-![Jasper Ridge](/images/jasper.png)
+![ ](/images/jasper.png)
 
 # Abstract
 Acorn production in Quercus agrifolia (Coast Live Oak) is influenced by multiple environmental and structural factors, yet the extent of these influences remains unclear. We hypothesized that (1) the south-facing sides of trees would produce more acorns due to greater sunlight exposure, (2) trees with larger diameters at breast height (DBH) and greater crown diameters would have higher acorn production, and (3) acorn yield would decrease with lower vegetation density. We measured acorn production using quadrat sampling, analyzed the tree's structural attributes, and assessed vegetation density through the Normalized Difference Vegetation Index (NDVI). Our results indicated weak correlations between acorn yield and all tested variables, with p-values exceeding 0.05 and low R² values, suggesting these factors do not significantly correlate to acorn production. The findings highlight the complexity of acorn yield dynamics, likely influenced by unmeasured factors such as genetic variability, soil composition, and masting cycles. Future research with larger sample sizes and refined environmental metrics is needed to improve predictive models. These insights contribute to oak conservation efforts and understanding of acorn availability for wildlife.
@@ -127,81 +127,28 @@ leaflet(tree_full) %>%
             title = "Tree Structure")
 
 ```
-
+Click on the dots on our interactive map to explore our dataset! 
 
 
 ## Data Collection
 We collected data from 16 mature coast live oak trees within the preserve in January of Winter 2024 and 2025. These trees were healthy, free from major diseases, and of varying sizes. The structural measurements we took from each tree were diameter at breast height (DBH), crown diameters, and canopy exposures. DBH was measured at 1.4 m above the ground using diameter tape. The DBH of the three largest trunks was recorded for trees with multiple trunks, and one final DBH was taken from such trees by taking the square root of the sum of all three DBHs. We measured two central diameters: (1) the diameter of the maximum axis and (2) the axis perpendicular to the maximum axis. We acquired acorn production measurements using the quadrat method. The quadrats, which measured 62cm x 62cm, were placed in each cardinal direction of the focal tree, ensuring that the quadrat was aligned to the edge of the tree crown. Only acorn caps within the quadrats were counted and incorporated into the dataset to prevent double counting. Additionally, we incorporated the Normalized Difference Vegetation Index (NDVI) from the Sentinel-2 satellite for the 2024 and 2025 winter seasons to obtain vegetation density near our 16 trees. 
 
-## Data Analysis
-To assess the impact of cardinal direction on acorn production, we ran a paired t-test to compare the difference between acorn production on the north and south sides of the trees; we controlled for year-to-year variation by using a linear mixed-effects model to account for both fixed, such as the year, and random effects. We used simple linear regression to understand correlations between the DBH or crown diameter and acorn production. We then incorporated these findings into a multiple linear regression to assess the impact of DBH and crown diameter on acorn production. Additionally, we analyzed the impact of vegetation density on acorn production using simple linear regression and a linear mixed-effects model to account for both fixed and random effects. 
-
-
 # Overview of Results
 Acorn production across 2024 and 2025 demonstrated minimal correlations with tree size metrics, NDVI index, and regional grouping. Box plots of acorn count across groups showed no statistically significant differences between each tree's North and South regions, with all p-values exceeding 0.1. Analysis of tree size metrics, including DBH and crown diameters, revealed weak correlations with total acorn production, with R² values below 0.07 and p-values consistently above 0.3. Similarly, 3D regression analysis of acorn production against DBH and average crown diameter in 2024 and 2025 indicated weak explanatory power (R² = 0.073 and 0.07, respectively), emphasizing the limited predictive utility of these variables. Finally, the relationship between acorn production and the NDVI across 2024, 2025, and combined years also demonstrated minimal correlation, with low R² values (0.005 to 0.045) and high p-values (p > 0.4). 
 
-## Relationship Between Cardinal Direction & Acorn Production
-```{r setupp, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
-# Load required libraries
-library(ggplot2)
-library(showtext)
-library(gridExtra)
-font_add_google("Lato", "lato")
-showtext_auto()
+## Relationship Between Cardinal Direction and Acorn Production
+To assess the impact of cardinal direction on acorn production, we ran a paired t-test to compare the difference between acorn production on the north and south sides of the trees; we controlled for year-to-year variation by using a linear mixed-effects model to account for both fixed, such as the year, and random effects. 
+![ ](/images/card.png) 
 
+## Relationship Between DBH & Crown Diameter and Acorn Production
+We used simple linear regression to understand correlations between the DBH or crown diameter and acorn production. We then incorporated these findings into a multiple linear regression to assess the impact of DBH and crown diameter on acorn production.
+![ ](/images/8fig.png) 
+![ ](/images/3d1.png) 
+![ ](/images/3d2.png) 
 
-# Hard-coded data for 2024 and 2025 including zeros
-north_2024 <- c(13, 0, 1, 0, 1, 23, 1, 11, 0, 2, 69, 9, 0, 0, 0, 1)
-south_2024 <- c(11, 16, 2, 11, 1, 37, 0, 36, 0, 6, 41, 72, 1, 0, 0, 8)
-north_2025 <- c(50, 8, 42, 23, 13, 231, 2, 209, 5, 26, 145, 18, 18, 12, 7, 12)
-south_2025 <- c(118, 66, 6, 14, 5, 390, 5, 202, 6, 62, 57, 12, 16, 17, 2, 21)
-# Combined data
-combined_north <- c(north_2024, north_2025)
-combined_south <- c(south_2024, south_2025)
-# Perform T-tests
-t_test_2024 <- t.test(north_2024, south_2024, alternative = "two.sided", var.equal = FALSE)
-t_test_2025 <- t.test(north_2025, south_2025, alternative = "two.sided", var.equal = FALSE)
-t_test_combined <- t.test(combined_north, combined_south, alternative = "two.sided", var.equal = FALSE)
-# Display t-test results
-t_test_results <- data.frame(
-  Year = c("2024", "2025", "Combined"),
-  T_value = c(round(t_test_2024$statistic, 3), round(t_test_2025$statistic, 3), round(t_test_combined$statistic, 3)),
-  P_value = c(round(t_test_2024$p.value, 3), round(t_test_2025$p.value, 3), round(t_test_combined$p.value, 3)),
-  Mean_North = c(round(mean(north_2024), 1), round(mean(north_2025), 1), round(mean(combined_north), 1)),
-  Mean_South = c(round(mean(south_2024), 1), round(mean(south_2025), 1), round(mean(combined_south), 1))
-)
-
-# Prepare data in long format for ggplot
-df_long <- data.frame(
-  Quadrat = rep(c("North", "South"), each = 32),
-  Acorn_Count = c(north_2024, south_2024, north_2025, south_2025),
-  Year = rep(c("2024", "2024", "2025", "2025"), each = 16)
-)
-```
-
-```{r plot-card}
-# Function to create a single combined boxplot with all years
-ggplot(df_long, aes(x = interaction(Year, Quadrat), y = Acorn_Count, fill = Quadrat)) +
-  geom_boxplot(outlier.shape = 21, outlier.color = "black", outlier.fill = "white", alpha = 0.7, 
-               notch = TRUE, width = 0.6, fatten = 1.5) +
-  geom_jitter(color = "black", width = 0.3, size = 3, alpha = 0.8) +
-  stat_summary(fun = "mean", geom = "point", shape = 18, size = 3, color = "black") +
-  scale_fill_manual(values = c("North" = "#0073C2", "South" = "#E74C3C")) +
-  labs(x = "Year & Quadrat", y = "Acorn Count", title = "Acorn Count Comparison by Year and Quadrat") +
-  theme_minimal(base_size = 14) +
-  theme(
-    axis.title = element_text(size = 16, family = "lato"),
-    axis.text = element_text(size = 14, family = "lato"),
-    panel.grid.major = element_line(color = "gray90"),
-    panel.grid.minor = element_blank(),
-    text = element_text(family = "lato")
-  )
-
-```
 
 ## Relationship Between NDVI and Acorn Production
-This analysis examines the relationship between NDVI (Normalized Difference Vegetation Index) and acorn production across two years (2024 and 2025).
+We analyzed the impact NDVI (Normalized Difference Vegetation Index) and acorn production across two years (2024 and 2025) using simple linear regression and a linear mixed-effects model to account for both fixed and random effects. 
 
 ```{r setup, include=FALSE}
 # Load necessary libraries
@@ -263,7 +210,6 @@ r2_mixed <- round(r.squaredGLMM(model_mixed)[1], 3)  # Marginal R² (fixed effec
 p_value_mixed <- round(coef(summary(model_mixed))["NDVI", "Pr(>|t|)"], 3)
 ```
 
-### NDVI vs Acorn Production (2024)
 
 ```{r plot-2024}
 ggplot(merged_data, aes(x = NDVI_2024, y = sum_acorns_2024)) +
@@ -279,7 +225,6 @@ ggplot(merged_data, aes(x = NDVI_2024, y = sum_acorns_2024)) +
            hjust = 1, size = 5)
 ```
 
-### NDVI vs Acorn Production (2025)
 
 ```{r plot-2025}
 ggplot(merged_data, aes(x = NDVI_2025, y = sum_acorns_2025)) +
@@ -294,8 +239,6 @@ ggplot(merged_data, aes(x = NDVI_2025, y = sum_acorns_2025)) +
            label = paste0("R² = ", r2_2025, "\n p = ", p_value_2025),
            hjust = 1, size = 5)
 ```
-
-### Combined Analysis (2024 & 2025)
 
 ```{r plot-combined}
 ggplot(long_data, aes(x = NDVI, y = sum_acorns, color = Year)) +
@@ -312,10 +255,46 @@ ggplot(long_data, aes(x = NDVI, y = sum_acorns, color = Year)) +
            hjust = 1, color = "black", size = 5)
 ```
 
-### Statistical Summary
+# Discussion
+Acorn production in coast live oaks is shaped by a complex interplay of physiological, genetic, and environmental factors. We found that tree size, crown exposure, and vegetation density did not significantly predict acorn yield. One biological interpretation of our data is that acorn yield is not solely determined by these structural tree characteristics but is also influenced by broader ecological and physiological processes (Noh et al. 2020). For example, trees may be allocating resources towards defense mechanisms, growth, or reproduction. Additionally, trees may be experiencing a period of masting where they fluctuate in acorn production based on the changing climate (Koenig et al. 2021). 
 
-```{r stats-summary}
-cat("2024 Model: R² =", r2_2024, ", p-value =", p_value_2024, "\n")
-cat("2025 Model: R² =", r2_2025, ", p-value =", p_value_2025, "\n")
-cat("Combined Mixed Model: R² =", r2_mixed, ", p-value =", p_value_mixed, "\n")
-```
+Overall, the models displayed weak fits and low explanatory power, highlighting the complexity of factors influencing acorn production. The results demonstrated weak correlations across all tested variables, with p-values consistently greater than 0.05 and low R² values suggesting that tree size, crown exposure, and vegetation density do not significantly predict acorn yield. Given these findings, our hypotheses that (1) the south-facing sides of trees produce more acorns, (2) larger trees with greater DBH and crown diameter produce more acorns, and (3) acorn production decreases with lower vegetation density were not supported by the data found from this study.
+
+This lack of statistical significance may be attributed to the relatively small sample size of 16 trees within a relatively small ecological range (Jasper Ridge Biological Preserve ‘Ootchamin ‘Ooyakma), which could have limited our ability to detect more subtle correlations between our factors and acorn production. For crown exposure, a potential consideration is the influence of microclimatic conditions, such as localized light availability and wind exposure, which may not be accurately captured by generalized crown exposure measurements (Fujiwara et al. 2024). For tree size, a potential reason is that physiological factors such as resource allocation, tree age, and internal health status may play a more critical role than size alone in determining acorn yield (Coomes & Allen, 2007). A potential explanation for the insignificant results regarding the NDVI hypothesis is the resolution of the satellite imagery used in our dataset. With a resolution of 250m, the dataset may have been too coarse to capture meaningful differences in vegetation density at the scale of individual trees, especially given their close proximity to one another. As a result, finer-scale variations in canopy cover and understory vegetation may have been lost, limiting the ability to detect any true relationship between NDVI and acorn production (Huang et al. 2021).
+
+Beyond the study structure, there are alternative explanations for our findings. It is possible that other unmeasured variables, such as soil composition (Hermans et al., 2020), insect herbivory (Valdés-Correcher et al. 2020), or individual tree genetics (Olave et al. 2020), played a larger role in determining acorn production than the variables we measured. Additionally, the observed variation in acorn production may be attributed to masting behavior, potentially as an evolutionary adaptation to optimize reproductive success and predator satiation (Demeny et al., 2025). 
+
+Given these limitations, we believe a broader dataset would help to clarify whether our studied factors have a meaningful effect on acorn yield. We recommend future studies incorporate significantly larger sample sizes of trees across multiple sites to capture a more extensive range of ecological and environmental conditions. To address the limitations of crown exposure, future studies should incorporate more precise microclimatic measurements, such as direct assessments of light availability using hemispherical photography or light sensors, as well as localized wind speed data. This would help to better quantify the specific environmental conditions affecting crown exposure and their potential effects on acorn production.
+
+Regarding DBH, future research should integrate physiological assessments of tree health and resource allocation, such as leaf nutrient content analysis, sap flow measurements, and dendrochronological studies of past growth patterns. These factors could provide deeper insight into how internal tree condition, rather than size alone, influences acorn yield.
+
+To address the limitations associated with NDVI resolution, we recommend future studies implement higher resolution remote sensing datasets, such as those from Sentinel-2 or commercial satellite imagery, to better capture localized variations in vegetation density. Alternative methods could also be valuable, such as LiDAR (Light Detection and Ranging), which can capture canopy structure data more accurately, or ground-based vegetation indices, which are more precise data points (Campbell et al. 2018; Ferrara et al. 2010). 
+
+In a broader ecological context, we see that previous studies have found mixed results regarding tree size and acorn production. While some research has shown a positive correlation between DBH and acorn yield (Greenberg, 2020), others have emphasized that acorn production is influenced by fluctuations in climate and/or physiological stress rather than tree size alone (Patterson et al., 2023). Our findings align with the latter, suggesting that tree size and crown exposure might not be primary drivers of acorn yield in coast live oak. These insights could be valuable for conservation efforts, especially when it comes to understanding oak regeneration patterns and predicting acorn availability for wildlife in different environmental conditions. Future research could integrate long-term monitoring to assess the combined influence of environmental stressors and intrinsic tree characteristics on acorn production. It could also help account for masting behavior that may have influenced our data, as analyzing additional years could reveal shifts corresponding to varying climatic conditions each year. In conclusion, our study did not find strong statistical support for the influence of tree size, crown exposure, or vegetation density on acorn production.
+
+
+# References
+Bilir, N., K. Jeon, Y. Kim, and K. Kang. 2023. Fertility variation and effective population size across varying acorn yields in Turkey oak (Quercus cerris L.): implications for seed source management. Forests 14: 2222. DOI: 10.3390/f14112222.
+Campbell, M. J., P. E. Dennison, A. T. Hudak, L. M. Parham, and B. W. Butler. 2018. Quantifying understory vegetation density using small-footprint airborne LiDAR. Remote Sensing of Environment 215: 330–342. DOI: 10.1016/j.rse.2018.06.023.
+Coomes, D. A., & Allen, R. B. (2007). Effects of size, competition and altitude on tree growth. Journal of Ecology, 95(5), 1084–1095. DOI:10.1111/j.1365-2745.2007.01280.x
+Demeny, K. M., Ellington, E. H., Kuhn, K. M., & Lashley, M. A. (2025). Intra-annual variation in oak masting affects wildlife feeding behavior. Current Zoology, 71(1), 79–88. DOI: 10.1093/cz/zoae026
+Ferrara, R. M., C. Fiorentino, N. Martinelli, P. Garofalo, and G. Rana. 2010. Comparison of different ground-based NDVI measurement methodologies to evaluate crop biophysical properties. Italian Journal of Agronomy 5:145–154. DOI: 10.4081/ija.2010.145.
+Francis, J. K. 1983. Acorn production and tree growth of Nuttall oak in a green-tree reservoir. U.S. Department of Agriculture, Forest Service, Southern Forest Experiment Station. DOI: https://doi.org/10.2737/SO-RN-289.
+Fujiwara, K., Khomiakov, M., Yap, W., Ignatius, M., & Biljecki, F. (2024). Microclimate Vision: Multimodal prediction of climatic parameters using street-level and satellite imagery. Sustainable Cities and Society 114: 105733. DOI: 10.1016/j.scs.2024.105733.
+Greenberg, C. H. (2020). Oak growth and acorn production in southern Appalachian mature forests and shelterwood with reserves regeneration harvests. Forest Ecology and Management 474: 118691. DOI: 10.1016/j.foreco.2020.118691
+Hanberry, B. B., and G. J. Nowacki. 2016. Oaks were the historical foundation genus of the east-central United States. Quaternary Science Reviews 145: 94-103. DOI: 10.1016/j.quascirev.2016.05.037.
+He, L., X. Zhang, X. Wang, H. Ullah, Y. Liu, and J. Duan. 2023. Tree crown affects biomass allocation and its response to site conditions and the density of Platycladus orientalis Linnaeus plantation. Forests 14: 2433. DOI: 10.3390/f14122433.
+Hermans, S. M., Buckley, H. L., Case, B. S., Curran-Cournane, F., Taylor, M., & Lear, G. (2020). Using soil bacterial communities to predict physico-chemical variables and soil quality. Microbiome 8:Article 79. DOI: 10.1186/s40168-020-00835-8.
+Huang, S., L. Tang, J. P. Hupy, Y. Wang, and G. Shao. 2021. A commentary review on the use of normalized difference vegetation index (NDVI) in the era of popular remote sensing. Journal of Forestry Research 32: 1–6. DOI: 10.1007/s11676-020-01155-1.
+Koenig, W. D., and J. M. H. Knops. 2005. The mystery of masting in trees: Some trees reproduce synchronously over large areas, with widespread ecological effects, but how and why? American Scientist 93: 340–347. DOI: https://doi.org/10.1511/2005.54.963.
+Koenig, W. D., J. M. H. Knops, W. J. Carmen, and M. B. Pesendorfer. 2021. Testing the terminal investment hypothesis in California oaks. Forest Ecology and Management 474: 118904. DOI: 10.1016/j.foreco.2020.118904.
+Lämke, J., and I. Bäurle. 2017. Epigenetic and chromatin-based mechanisms in environmental stress adaptation and stress memory in plants. Genome Biology 18: 124. DOI: 10.1186/s13059-017-1263-6.
+Marañón, T., and J. W. Bartolome. 1994. Coast live oak (Quercus agrifolia) effects on grassland biomass and diversity. Madroño 41: 39–52. DOI: https://www.jstor.org/stable/41426237.
+Noh, J., Y. Kim, J. Lee, S. Cho, and Y. Choung. 2020. Annual and spatial variabilities in the acorn production of Quercus mongolica. Journal of Ecology and Environment 44: 26. DOI: 10.1186/s41610-020-00169-4. 
+Olave, R. J., C. T. Kelleher, E. J. Meehan, and M. Delêtre. 2020. Growth and genetic predisposition of induced acorn production in pedunculate oak (Quercus robur L.) within 15 years of planting. Forest Ecology and Management 474: 118904. DOI: 10.1016/j.foreco.2020.118904.
+Patterson, T. W., C. H. Greenberg, and A. Hacket-Pain. 2023. Acorn production, climate, and tree-ring growth of five oak species in southern Appalachian forests. Forest Ecology and Management 546: 121310. DOI: 10.1016/j.foreco.2023.121310.
+Pérez-Ramos, I. M., M. A. Ourcival, J. M. Limousin, and S. Rambal. 2011. Increased drought reduces acorn production in Quercus ilex coppices: Thinning mitigates this effect but only in the short term. Forestry 84: 73-82. DOI: 10.1093/forestry/cpq039.
+Rose, A. K., C. H. Greenberg, and T. M. Fearer. 2012. Acorn production prediction models for five common oak species of the eastern United States. The Journal of Wildlife Management 76: 750–758. DOI: 10.1002/jwmg.291.
+Schlaegel, B. E. 1990. Quercus phellos L., Willow Oak. Silvics of North America, Volume 2: Hardwoods, pp. 715-720. U.S. Department of Agriculture, Forest Service, Washington, D.C.
+Valdés-Correcher, E., A. Bourdin, S. C. González-Martínez, X. Moreira, A. Galmán, B. Castagneyrol, and A. Hampe. 2020. Leaf chemical defenses and insect herbivory in oak: accounting for canopy position unravels marked genetic relatedness effects. PeerJ 8:e9227. DOI: 10.7717/peerj.9227.
+
